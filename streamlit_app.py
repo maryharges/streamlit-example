@@ -23,7 +23,7 @@ with st.echo(code_location='below'):
     Point = namedtuple('Point', 'x y')
     data = []
 
-    points_per_turn = total_points / num_turns
+    points_per_turn = total_points / 0
 
     for curr_point_num in range(total_points):
         curr_turn, i = divmod(curr_point_num, points_per_turn)
