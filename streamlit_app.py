@@ -1,41 +1,63 @@
-from collections import namedtuple
-import altair as alt
-import math
+import numpy as np
 import pandas as pd
 import streamlit as st
-import os
-
-"""
-# Change 66
-
-Edit `/streamlit_app.py` to customize this app to your heart's desire :heart:
-
-If you have any questions, checkout our [documentation](https://docs.streamlit.io) and [community
-forums](https://discuss.streamlit.io).
-
-In the meantime, below is an example of what you can do with just a few lines of code:
-"""
+from streamlit.components.v1 import iframe
 
 
-with st.echo(code_location='below'):
-    st.write("Test:", os.environ["SF_PARTNER"])
-    st.write("DB username:", st.secrets["db_username"])
-    total_points = st.slider("Number of points in spiral", 1, 5000, 2000)
-    num_turns = st.slider("Number of turns in spiral", 1, 100, 9)
+@st.cache_data
+def get_empty_grid() -> pd.DataFrame:
+    return pd.DataFrame(np.zeros((10, 10))).replace(0, "").astype(str)
 
-    Point = namedtuple('Point', 'x y')
-    data = []
 
-    points_per_turn = total_points / 0
+st.set_page_config(layout="wide", page_title="Data Editor", page_icon="🧮")
 
-    for curr_point_num in range(total_points):
-        curr_turn, i = divmod(curr_point_num, points_per_turn)
-        angle = (curr_turn + 1) * 2 * math.pi * i / points_per_turn
-        radius = curr_point_num / total_points
-        x = radius * math.cos(angle)
-        y = radius * math.sin(angle)
-        data.append(Point(x, y))
+st.title("📥 Clipboard")
+st.caption("This is a demo of the `st.experimental_data_editor`.")
+GOOGLE_SHEET_URL = (
+    "https://docs.google.com/spreadsheets/d/1Z0zd-5dF_HfqUaDDq4BWAOnsdlGCjkbTNwDZMBQ1dOY/edit#gid=0"
+)
 
-    st.altair_chart(alt.Chart(pd.DataFrame(data), height=500, width=500)
-        .mark_circle(color='#0068c9', opacity=0.5)
-        .encode(x='x:Q', y='y:Q'))
+left, right = st.columns(2)
+
+with left:
+    """Here's an empty grid... It's not yet super useful."""
+
+    empty_grid = pd.DataFrame(np.zeros((20, 4))).replace(0, "").astype(str)
+    df = st.experimental_data_editor(empty_grid, use_container_width=True, height=600)
+
+with right:
+    st.write(
+        f"""Want to fill it real quick? Just copy the data from [this Google Sheet]({GOOGLE_SHEET_URL}) and paste it in!"""
+    )
+
+    names = [
+        "Nicholas Nguyen",
+        "Patrick Fuentes",
+        "Sheri Stewart",
+        "Gabrielle Mckee",
+        "Thomas Bell",
+        "Joshua Anderson",
+        "Leslie Gray",
+        "Patricia Young",
+        "Kathleen Fowler",
+        "Seth Moreno",
+        "Timothy Mason",
+        "Matthew Trujillo",
+        "Robert Nguyen",
+        "Shelly Boyle",
+        "Harry Mitchell",
+        "Stephanie Chavez",
+        "Donald Cuevas",
+        "April Gonzalez",
+        "Jason Taylor",
+    ]
+
+    iframe(
+        src="https://docs.google.com/spreadsheets/d/1Z0zd-5dF_HfqUaDDq4BWAOnsdlGCjkbTNwDZMBQ1dOY/edit#gid=0",
+        height=600,
+    )
+
+if any(name in names for name in df[0].values):
+    if "🎉" not in st.session_state:
+        st.balloons()
+        st.session_state["🎉"] = True
